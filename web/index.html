@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Voicepad · 配音工作台</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='5' fill='%23191c21'/%3E%3Cpath d='M5 9v6m5-11v16m5-13v10m5-6v2' stroke='%238bd7bc' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6m5-11v16m6-13v10m5-6v2"/></svg><span>Voicepad</span><span class="local-label">本地配音</span></div>
+    <div class="session-controls"><select id="sessions" aria-label="选择 session"></select><button id="new-session" class="quiet">＋ 新建 session</button><span id="save-status" role="status">正在加载</span></div>
+    <div class="header-actions"><button id="help" class="quiet" aria-label="使用帮助">?</button><button id="export-srt" class="quiet">导出字幕</button><button id="export-audio" class="primary">↓ 导出人声 WAV</button></div>
+  </header>
+
+  <main class="workspace">
+    <section class="studio" aria-label="视频与录音">
+      <div class="section-heading"><span>视频预览</span><span id="video-name" class="filename">尚未导入视频</span><button id="import-video" class="text-button">导入视频</button></div>
+      <div class="video-stage">
+        <video id="video" preload="auto" playsinline></video>
+        <div id="video-empty" class="empty-video"><div class="video-symbol">▷</div><h1>从你的视频开始</h1><p>导入视频和 SRT，准备录第一句。</p><button id="import-first-video" class="primary">导入视频</button></div>
+        <div id="record-indicator" class="record-indicator" hidden><span></span>正在录音 <b id="record-elapsed">00:00</b></div>
+        <div id="count-in" class="count-in" role="status" aria-label="录音准备，1.5 秒后开始" hidden></div>
+      </div>
+      <section class="prompter" aria-label="同步提词">
+        <div class="prompter-meta"><span id="current-speaker">准备就绪</span><span id="cue-clock">导入 SRT 后显示逐句计时</span></div>
+        <p id="current-caption">让画面前进，让声音跟上。</p>
+        <div class="next-caption"><span>下一句</span><p id="next-caption">—</p></div>
+      </section>
+
+      <div class="transport">
+        <div class="seek-row"><output id="position">00:00:00.000</output><input id="seek" type="range" min="0" max="1" step="0.001" value="0" aria-label="视频播放位置"><output id="duration">00:00:00.000</output></div>
+        <div class="transport-actions"><div class="play-controls"><button id="previous-cue" class="icon-button" title="上一句" aria-label="上一句">|‹</button><button id="play" class="play-button" aria-label="播放视频">▶</button><button id="next-cue" class="icon-button" title="下一句" aria-label="下一句">›|</button></div><span class="keyboard-hint">空格 播放 / 暂停</span><label class="volume-control"><input id="original-audio" type="checkbox" checked> 视频原声 <input id="video-volume" type="range" min="0" max="1" step="0.01" value="0.35" aria-label="视频原声音量"></label></div>
+      </div>
+
+      <section class="recording-desk" aria-label="录音控制">
+        <div class="mode-row"><div class="mode-switch" role="group" aria-label="录音或重放"><button id="mode-record" class="active" aria-pressed="true">录音模式</button><button id="mode-replay" aria-pressed="false">重放模式</button></div><span id="mode-description">已录人声静音，专注录新的一遍</span></div>
+        <div class="record-row"><select id="microphone" aria-label="麦克风"><option value="">默认麦克风</option></select><button id="refresh-mics" class="icon-button" title="选择麦克风并授权" aria-label="刷新麦克风">↻</button><div class="level-meter" title="麦克风音量"><i id="level"></i></div><label class="count-option"><input id="countdown-enabled" type="checkbox" checked> 1.5 秒准备</label><button id="record" class="record-button"><span>●</span> 开始录音</button></div>
+        <p id="record-note" class="subtle">从当前播放位置开始。右侧“录这一句”会在该句结束时自动停止。</p>
+      </section>
+
+      <section class="voice-track" aria-label="独立人声音轨">
+        <div class="track-heading"><span>人声音轨 <b id="clip-count">0 段</b></span><div><button id="undo" class="text-button" disabled>撤销删除</button><button id="clear-recordings" class="text-button danger-text" disabled>清空录音</button></div></div>
+        <div id="track" class="track"><span class="track-empty">录音会出现在这里 · 导出时保留与视频相同的时间位置</span><i id="playhead"></i></div>
+        <details id="recordings-detail"><summary>查看录音片段 <span id="recordings-summary">暂无录音</span></summary><div id="recording-list"></div></details>
+      </section>
+    </section>
+
+    <aside class="script-panel" aria-label="字幕编辑">
+      <div class="script-heading"><div><h2>字幕 / 提词</h2><span id="cue-count">0 句</span></div><button id="import-srt" class="quiet">↑ 导入 SRT</button></div>
+      <div class="script-tools"><input id="search" type="search" placeholder="搜索字幕或说话人" aria-label="搜索字幕"><label><input id="follow" type="checkbox" checked> 跟随播放</label></div>
+      <p class="timing-help">直接修改每句起止时间。点击文字跳到这一句。</p>
+      <div id="cue-list" class="cue-list"><div class="script-empty">导入 SRT 后，字幕会出现在这里。</div></div>
+      <div class="script-footer"><span id="progress-label">已录 0 / 0 句</span><span>时间格式 HH:MM:SS.mmm</span></div>
+    </aside>
+  </main>
+
+  <input id="video-file" type="file" accept="video/mp4,video/webm,video/quicktime,.m4v,.ogg" hidden>
+  <input id="srt-file" type="file" accept=".srt" hidden>
+  <div id="toast" class="toast" role="status" hidden><span></span><button aria-label="关闭提示">×</button></div>
+
+  <dialog id="new-dialog"><form method="dialog"><div class="dialog-heading"><h2>新建 session</h2><button class="icon-button" value="cancel" aria-label="取消新建">×</button></div><p>一个干净的人声音轨。之前的 session 随时可以切回来。</p><label class="field-label">Session 名称<input id="session-name" maxlength="120" required></label><label class="reuse-label"><input id="reuse-source" type="checkbox" checked> 沿用当前视频和字幕</label><div class="dialog-actions"><button class="quiet" value="cancel" formnovalidate>取消</button><button id="create-session" class="primary" value="create">创建 session</button></div></form></dialog>
+
+  <dialog id="confirm-dialog"><form method="dialog"><div class="dialog-heading"><h2 id="confirm-title"></h2></div><p id="confirm-description"></p><div class="dialog-actions"><button class="quiet" value="cancel">取消</button><button class="primary" value="confirm">确认</button></div></form></dialog>
+
+  <dialog id="help-dialog"><div class="dialog-heading"><h2>只做配音需要的事</h2><button id="close-help" class="icon-button" aria-label="关闭帮助">×</button></div><ol><li><b>导入</b>视频与 SRT，点一句字幕定位，直接编辑起止时间。</li><li><b>录音模式</b>不播放已录人声。点“开始录音”连续录；点“录这一句”逐句录。</li><li><b>重放模式</b>同步播放视频、字幕和人声音轨。视频原声独立开关。</li><li><b>删错句</b>：每句的“删除录音”只删这句；录音片段列表也可以逐段删除。误删后点“撤销删除”。</li><li><b>导出人声 WAV</b>保留时间轴上的空白，与视频从 0 秒一起播放即可对齐。导出不包含视频原声。</li></ol><p>Session 自动保存在本机。新建不会覆盖旧 session。录音时建议戴耳机；首次使用允许浏览器访问麦克风。</p><p class="subtle">调整字幕起点时，该句录音一起移动；调整终点只改变字幕显示时长。字幕里的 [A] 等说话人标签不会显示在提词正文中。</p><p class="subtle">快捷键：空格 播放/暂停 · R 开始/停止录音 · Esc 取消倒计时或停止录音。请使用 Chrome 或 Edge。</p></dialog>
+  <script type="module" src="/app.js"></script>
+</body>
+</html>

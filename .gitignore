@@ -1,0 +1,35 @@
+# Local media, recordings, sessions, exports, and development captures
+/data/
+/output/
+/tests/output/
+*.lnk
+*.mp4
+*.webm
+*.mov
+*.m4v
+*.wav
+*.mp3
+*.flac
+*.ogg
+
+# Local browser scenarios requiring private video fixtures
+/tests/browser*.js
+/tests/browser.config.json
+/tests/VERIFICATION.md
+
+# Python, editors, operating systems, and credentials
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+node_modules/
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.log
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
