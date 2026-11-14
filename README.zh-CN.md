@@ -57,3 +57,7 @@ macOS / Linux 使用 `python3 server.py --open`。
 本地存储与 HTTP 检查：`python -m unittest discover -s tests -p "test_*.py"`
 
 音频实现参考浏览器官方文档：[AudioWorklet](https://developer.mozilla.org/en-US/docs/Web/API/AudioWorkletProcessor)、[音频定时播放](https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode/start)、[离线音轨合成](https://developer.mozilla.org/en-US/docs/Web/API/OfflineAudioContext/startRendering)。
+
+## 开源协议
+
+本项目采用 [MIT License](LICENSE)。Copyright (c) 2026 Hyper-Duck。

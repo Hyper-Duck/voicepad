@@ -103,3 +103,7 @@ web/core.mjs               Subtitle and audio utilities
 web/recorder-worklet.js    Microphone PCM capture
 tests/                     Dependency-free core and server tests
 ```
+
+## License
+
+[MIT License](LICENSE). Copyright (c) 2026 Hyper-Duck.
